@@ -12,6 +12,7 @@ services:
             - laravel
         depends_on:
             - mysql
+            - redis
 
     nginx:
         image: nginx:stable-alpine
@@ -34,10 +35,40 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: laravel
-            MYSQL_USER: laravel
-            MYSQL_PASSWORD: secret
+            MYSQL_USER: root
+            MYSQL_PASSWORD: root
         volumes:
             - dbdata:/var/lib/mysql
+        networks:
+            - laravel
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: laravel_phpmyadmin
+        environment:
+            PMA_HOST: mysql
+            PMA_PORT: 3306
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - "8081:80"
+        depends_on:
+            - mysql
+        networks:
+            - laravel
+
+    redis:
+        image: redis:alpine
+        container_name: laravel_redis
+        ports:
+            - "6379:6379"
+        networks:
+            - laravel
+
+    mailhog:
+        image: mailhog/mailhog
+        container_name: laravel_mailhog
+        ports:
+            - "8025:8025"
         networks:
             - laravel
 
