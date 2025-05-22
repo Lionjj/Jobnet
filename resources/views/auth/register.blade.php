@@ -40,17 +40,21 @@
         </div>
 
         <div class="mt-4">
-            <x-input-label for="role" class="form-label" :value="__('Select Role')" />
-            <select name="role" id="role" class="form-select @error('role') is-invalid @enderror" required>
+            <x-input-label for="role" :value="__('Select Role')" />
+
+            <select name="role" id="role"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm @error('role') border-red-500 @enderror"
+                required>
                 <option value="" disabled selected>-- Seleziona un ruolo --</option>
-                <option value="candidate"> {{__('Candidate') }}</option>
-                <option value="recruiter">{{__('Recruiter') }}</option>
+                <option value="candidate">{{ __('Candidate') }}</option>
+                <option value="recruiter">{{ __('Recruiter') }}</option>
             </select>
 
             @error('role')
-                <div class="invalid-feedback">{{ $message }}</div>
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
             @enderror
         </div>
+
 
 
         <div class="flex items-center justify-end mt-4">
