@@ -2,6 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ChatController;
+
+use App\Models\User;
+use Cmgmyr\Messenger\Models\Thread;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,6 +20,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{thread}', [MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{thread}', [MessageController::class, 'store'])->name('messages.store');
+    
+    Route::get('/utenti', [ChatController::class, 'utenti'])->name('chat.utenti');
+    Route::get('/chat/{user}', [ChatController::class, 'startChat'])->name('chat.avvia');
+    Route::get('/chat', [ChatController::class, 'redirect'])->name('chat.redirect');
+
 });
 
 require __DIR__.'/auth.php';
