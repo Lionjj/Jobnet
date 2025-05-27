@@ -25,6 +25,8 @@ services:
         depends_on:
             - app
             - mysql
+        environment:
+            - NGINX_CLIENT_MAX_BODY_SIZE=10M
 
     mysql:
         image: mysql:8

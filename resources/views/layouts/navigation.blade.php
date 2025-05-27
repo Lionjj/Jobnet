@@ -20,6 +20,19 @@
                     <x-nav-link :href="route('chat.redirect')" :active="request()->routeIs('chat.*') || request()->routeIs('messages.*')">
                         {{ __('Chat') }}
                     </x-nav-link>
+
+                    @if (Auth::user()->hasRole('recruiter'))
+                        <x-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.*')">
+                            {{ __('Company') }}
+                        </x-nav-link>
+                    @endif
+
+                     @if (Auth::user()->hasRole('recruiter'))
+                        <x-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.*')">
+                            {{ __('Jobs') }}
+                        </x-nav-link>
+                    @endif
+                    
                 </div>
             </div>
 
@@ -79,6 +92,12 @@
             <x-responsive-nav-link :href="route('chat.redirect')" :active="request()->routeIs('chat.*') || request()->routeIs('messages.*')">
                 {{ __('Chat') }}
             </x-responsive-nav-link>
+
+            @if (Auth::user()->hasRole('recruiter'))
+                <x-responsive-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.*')">
+                    {{ __('Company') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
         
          

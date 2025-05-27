@@ -4,9 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ChatController;
-
-use App\Models\User;
-use Cmgmyr\Messenger\Models\Thread;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\JobOffertController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,6 +30,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/chat/{user}', [ChatController::class, 'startChat'])->name('chat.avvia');
     Route::get('/chat', [ChatController::class, 'redirect'])->name('chat.redirect');
 
+});
+
+Route::middleware(['auth', 'role:recruiter'])->group(function () {
+    Route::resource('companies', CompanyController::class);
+    Route::resource('jobs', JobOffertController::class);
 });
 
 require __DIR__.'/auth.php';

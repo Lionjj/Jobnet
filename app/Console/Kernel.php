@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      *
      * @var array
      */
-    protected $commands = [
+    protected $commannonds = [
         // Qui registri i tuoi comandi personalizzati, ad es.:
         // \App\Console\Commands\RefreshApp::class,
         \App\Console\Commands\RefreshApp::class,
