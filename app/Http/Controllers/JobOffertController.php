@@ -18,7 +18,7 @@ class JobOffertController extends Controller
 
     public function create()
     {
-        $company = auth()->user()->company();
+        $company = auth()->user()->company;
 
         if (! $company) {
             return redirect()->route('companies.create')->with('error', 'Devi prima creare un’azienda per poter pubblicare un’offerta.');
@@ -40,6 +40,9 @@ class JobOffertController extends Controller
             'skills_required' => 'nullable|array',
             'benefits' => 'nullable|array',
         ]);
+
+        $validated['skills_required'] = array_map('strtolower', $validated['skills_required'] ?? []);
+        $validated['benefits'] = array_map('strtolower', $validated['benefits'] ?? []);
 
         $company = auth()->user()->company;
 
@@ -91,6 +94,9 @@ class JobOffertController extends Controller
             'skills_required' => 'nullable|array',
             'benefits' => 'nullable|array',
         ]);
+        
+        $validated['skills_required'] = array_map('strtolower', $validated['skills_required'] ?? []);
+        $validated['benefits'] = array_map('strtolower', $validated['benefits'] ?? []);
 
         $job->update([
             ...$validated,
@@ -110,5 +116,91 @@ class JobOffertController extends Controller
         $job->delete();
 
         return redirect()->route('jobs.index')->with('success', 'Offerta eliminata con successo.');
+    }
+
+    public function publicIndex(Request $request)
+    {
+        $query = JobOffert::where('is_active', true);
+        
+        // Filtri applicati
+        if ($request->filled('job_type')) {
+            $query->where('job_type', $request->job_type);
+        }
+        
+        if ($request->filled('contract_type')) {
+            $query->where('contract_type', $request->contract_type);
+        }
+        
+        if ($request->filled('experience_level')) {
+            $query->where('experience_level', $request->experience_level);
+        }
+        
+        if ($request->filled('location')) {
+            $query->where('location', 'like', '%' . $request->location . '%');
+        }
+        
+        if ($request->filled('keyword')) {
+            $keyword = $request->keyword;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                ->orWhere('description', 'like', "%{$keyword}%");
+            });
+        }
+        
+        if ($request->filled('skill')) {
+            $skill = $request->skill; 
+            $query->whereJsonContains('skills_required', $skill);
+            
+        }
+        
+        if ($request->filled('benefit')) {
+            $benefit = $request->benefit;
+            $query->whereJsonContains('benefits', $benefit);
+        }
+
+        $allSkills = JobOffert::where('is_active', true)
+            ->pluck('skills_required')
+            ->map(function ($skills) {
+                if (is_array($skills)) {
+                    return array_map('strtolower', $skills);
+                }
+                if (is_string($skills)) {
+                    return array_map('strtolower', json_decode($skills, true) ?: []);
+                }
+                return [];
+            })
+            ->flatten()
+            ->unique()
+            ->sort()
+            ->values();
+
+        $allBenefits = JobOffert::where('is_active', true)
+            ->pluck('benefits')
+            ->map(function ($benefits) {
+                if (is_array($benefits)) {
+                    return array_map('strtolower', $benefits);
+                }
+                if (is_string($benefits)) {
+                    return array_map('strtolower', json_decode($benefits, true) ?: []);
+                }
+                return [];
+            })
+            ->flatten()
+            ->unique()
+            ->sort()
+            ->values();
+
+        $savedJobs = auth()->user()->savedJobs()->paginate(10);
+        // Ottieni i job filtrati con paginazione
+        $jobs = $query->latest()->paginate(10)->withQueryString();
+
+        // Passa tutto alla view
+        return view('jobs.publicIndex', compact('jobs', 'allSkills', 'allBenefits', 'savedJobs'));
+    }
+
+    public function publicShow($id)
+    {
+        $job = JobOffert::where('is_active', true)->findOrFail($id);
+        return view('jobs.publicShow', compact('job'));
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\JobOffertController;
+use App\Http\Controllers\SavedJobController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,6 +36,16 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:recruiter'])->group(function () {
     Route::resource('companies', CompanyController::class);
     Route::resource('jobs', JobOffertController::class);
+});
+
+Route::middleware(['auth', 'role:candidate'])->group(function () {
+    Route::get('/offert', [JobOffertController::class, 'publicIndex'])->name('jobs.publicIndex');
+    Route::get('/offert/{id}', [JobOffertController::class, 'publicShow'])->name('jobs.publicShow');
+    Route::get('/offert/companies/{id}', [CompanyController::class, 'publicShow'])->name('companies.publicShow');
+    Route::post('/saved-jobs/{jobId}', [SavedJobController::class, 'store'])->name('saved-jobs.store');
+    Route::delete('/saved-jobs/{jobId}', [SavedJobController::class, 'destroy'])->name('saved-jobs.destroy');
+    Route::get('/saved-jobs', [SavedJobController::class, 'savedJobs'])->name('saved-jobs.index');
+
 });
 
 require __DIR__.'/auth.php';

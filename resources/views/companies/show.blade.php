@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-4xl mx-auto bg-white p-8 rounded shadow space-y-8">
+    <div class="max-w-4xl mx-auto bg-white p-8 mt-10 rounded shadow space-y-8">
 
         {{-- Titolo + Logo --}}
         <div class="flex items-start justify-between gap-6">

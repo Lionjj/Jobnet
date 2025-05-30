@@ -40,7 +40,7 @@ class CompanyController extends Controller
         ]);
 
         $validated['user_id'] = auth()->id();
-        $validated['benefits'] = json_encode($validated['benefits'] ?? []);
+        $validated['benefits'] = array_map('strtolower', $validated['benefits'] ?? []);
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('logos', 'public');
             $validated['logo'] = $path;
@@ -84,7 +84,8 @@ class CompanyController extends Controller
             $path = $request->file('logo')->store('logos', 'public');
             $validated['logo'] = $path;
         }
-        $validated['benefits'] = json_encode($validated['benefits'] ?? []);
+
+        $validated['benefits'] = array_map('strtolower', $validated['benefits'] ?? []);
         $company->update($validated);
 
         return redirect()->route('companies.show', $company)->with('success', 'Azienda aggiornata con successo.');
@@ -96,5 +97,11 @@ class CompanyController extends Controller
         $company->delete();
 
         return redirect()->route('companies.index')->with('success', 'Azienda eliminata con successo.');
+    }
+
+     public function publicShow($id)
+    {
+        $company = Company::findOrFail($id);
+        return view('companies.publicShow', compact('company'));
     }
 }

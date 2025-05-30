@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-3xl mx-auto space-y-6">
+    <div class="max-w-3xl mx-auto space-y-6 mt-10">
 
         {{-- Titolo allineato al contenitore --}}
         <h1 class="text-2xl font-bold text-gray-900">Crea una nuova azienda</h1>

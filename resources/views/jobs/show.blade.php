@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
+    <div class="max-w-3xl mx-auto bg-white p-6 mt-10 rounded-lg shadow">
 
         <h1 class="text-2xl font-bold text-gray-900 mb-2">
             {{ $job->title }}
@@ -30,10 +30,10 @@
                 @endif
             </ul>
         </div>
-@php
-    $skills = is_array($job->skills_required) ? $job->skills_required : json_decode($job->skills_required, true) ?? [];
-    $benefits =  is_array($job->benefits) ? $job->benefits : json_decode($job->benefits, true) ?? [];
-@endphp
+    @php
+        $skills = is_array($job->skills_required) ? $job->skills_required : json_decode($job->skills_required, true) ?? [];
+        $benefits =  is_array($job->benefits) ? $job->benefits : json_decode($job->benefits, true) ?? [];
+    @endphp
 
         @if(!empty($skills))
             <div class="mb-4">

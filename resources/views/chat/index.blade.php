@@ -9,16 +9,16 @@
         {{-- Selettore tab --}}
         <div class="flex space-x-4 border-b border-gray-200 mb-4">
             <button @click="window.location='{{ route('chat.redirect', ['tab' => 'threads']) }}'"
-    class="px-3 py-2 text-sm font-medium"
-    :class="tab === 'threads' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'">
-    Le tue conversazioni
-</button>
-            @if (Auth::user()->hasRole('recruiter'))
-                <button @click="window.location='{{ route('chat.redirect', ['tab' => 'users']) }}'"
-    class="px-3 py-2 text-sm font-medium"
-    :class="tab === 'users' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'">
-    Candidati
-</button>
+                class="px-3 py-2 text-sm font-medium"
+                :class="tab === 'threads' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'">
+                Le tue conversazioni
+            </button>
+                        @if (Auth::user()->hasRole('recruiter'))
+                            <button @click="window.location='{{ route('chat.redirect', ['tab' => 'users']) }}'"
+                class="px-3 py-2 text-sm font-medium"
+                :class="tab === 'users' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'">
+                Candidati
+            </button>
             @endif
         </div>
 

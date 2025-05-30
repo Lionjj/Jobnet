@@ -59,7 +59,7 @@ public function redirect(Request $request)
     // Se recruiter
     if ($me->hasRole('recruiter')) {
 
-        // 🔹 Threads: filtra solo se tab=threads
+        // Threads: filtra solo se tab=threads
         if ($tab === 'threads') {
             $threads = Thread::forUser($me->id)
                 ->when($search, function ($query) use ($me, $search) {
@@ -94,8 +94,6 @@ public function redirect(Request $request)
 
         return view('chat.index', compact('users', 'threads'));
     }
-
-    // ✅ Se candidato
     if ($me->hasRole('candidate')) {
         if ($tab === 'threads') {
             $threads = Thread::forUser($me->id)

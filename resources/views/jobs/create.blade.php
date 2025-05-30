@@ -9,7 +9,7 @@
     </div>
 @endif
 
-    <div class="max-w-3xl mx-auto">
+    <div class="max-w-3xl mx-auto mt-10">
         <h1 class="text-2xl font-bold text-gray-900 mb-6">Crea nuova offerta di lavoro</h1>
 
         <form action="{{ route('jobs.store') }}" method="POST" enctype="multipart/form-data"

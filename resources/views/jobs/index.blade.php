@@ -1,14 +1,14 @@
 <x-app-layout>
     <div class="max-w-4xl mx-auto space-y-6 py-10">
 
-        {{-- Titolo e bottone --}}
-        <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-gray-900">Le tue offerte di lavoro</h1>
-            
-        </div>
-
         {{-- Lista o messaggio --}}
         @if ($jobs->isEmpty())
+            {{-- Titolo--}}
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-gray-900">Le tue offerte di lavoro</h1>
+                
+            </div>
+
            <div class="bg-white shadow rounded-lg p-8 text-center text-gray-700">
                 <p class="text-lg font-medium mb-2">Non hai ancora pubblicato nessuna offerta di lavoro.</p>
                 <p class="text-sm mb-6 text-gray-500">Inizia creando una nuova offerta per attirare i candidati ideali.</p>
@@ -20,6 +20,12 @@
             </div>
             </div>
         @else
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-2xl font-bold">Le tue offerte di lavoro</h1>
+                <a href="{{ route('jobs.create') }}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                    + Nuova Offerta
+                </a>
+            </div>
             <div class="space-y-4">
                 @foreach ($jobs as $job)
                     <div class="bg-white p-6 rounded-lg shadow">

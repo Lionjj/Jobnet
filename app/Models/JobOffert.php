@@ -31,4 +31,10 @@ class JobOffert extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function savedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'saved_jobs')->withTimestamps();
+    }
+
 }

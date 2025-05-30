@@ -27,9 +27,13 @@
                         </x-nav-link>
                     @endif
 
-                     @if (Auth::user()->hasRole('recruiter'))
+                    @if (Auth::user()->hasRole('recruiter'))
                         <x-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.*')">
                             {{ __('Jobs') }}
+                        </x-nav-link>
+                    @elseif(Auth::user()->hasRole('candidate'))
+                        <x-nav-link :href="route('jobs.publicIndex')" :active="request()->routeIs('jobs.publicIndex')">
+                            {{ __('Offerte di lavoro') }}
                         </x-nav-link>
                     @endif
                     
@@ -96,6 +100,16 @@
             @if (Auth::user()->hasRole('recruiter'))
                 <x-responsive-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.*')">
                     {{ __('Company') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if (Auth::user()->hasRole('recruiter'))
+                <x-responsive-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.*')">
+                    {{ __('Jobs') }}
+                </x-responsive-nav-link>
+            @elseif(Auth::user()->hasRole('candidate'))
+                <x-responsive-nav-link :href="route('jobs.publicIndex')" :active="request()->routeIs('jobs.publicIndex')">
+                    {{ __('Offerte di lavoro') }}
                 </x-responsive-nav-link>
             @endif
         </div>
