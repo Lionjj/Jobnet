@@ -4,16 +4,12 @@
     @foreach ($benefits as $index => $benefit)
         <div class="flex gap-2">
             <input type="text"
-                   wire:model="benefits.{{ $index }}"
+                   wire:model="benefits.{{ $index }}.name"
                    name="benefits[]"
                    class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-600 focus:ring-blue-600"
                    placeholder="Es. buoni pasto, orario flessibile" />
+            <button type="button" wire:click="removeBenefit({{ $index }})" class="text-red-600 hover:text-red-800">✕</button>
 
-            <button type="button"
-                    wire:click="removeBenefit({{ $index }})"
-                    class="text-red-500 hover:text-red-700">
-                ✕
-            </button>
         </div>
     @endforeach
 

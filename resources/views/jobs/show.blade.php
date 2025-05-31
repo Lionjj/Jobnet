@@ -30,33 +30,28 @@
                 @endif
             </ul>
         </div>
-    @php
-        $skills = is_array($job->skills_required) ? $job->skills_required : json_decode($job->skills_required, true) ?? [];
-        $benefits =  is_array($job->benefits) ? $job->benefits : json_decode($job->benefits, true) ?? [];
-    @endphp
+        @php
+            $skills = $job->skills;   
+            $benefits = $job->benefits; 
+        @endphp
 
-        @if(!empty($skills))
+        @if($benefits->isNotEmpty())
             <div class="mb-4">
-                <h2 class="text-gray-900 font-semibold flex items-center gap-2">
-                    🎁 Benefit aziendali
-                </h2>
+                <h2 class="text-gray-900 font-semibold flex items-center gap-2">🎁 Benefit aziendali</h2>
                 <ul class="list-disc list-inside text-gray-600 mt-1 space-y-1">
                     @foreach ($benefits as $benefit)
-                        <li>{{ $benefit }}</li>
+                        <li>{{ $benefit->name }}</li>
                     @endforeach
                 </ul>
             </div>
         @endif
 
-
-        @if(!empty($skills))
+        @if($skills->isNotEmpty())
             <div class="mb-4">
-                <h2 class="text-gray-900 font-semibold flex items-center gap-2">
-                    💼 Competenze richieste
-                </h2>
+                <h2 class="text-gray-900 font-semibold flex items-center gap-2">💼 Competenze richieste</h2>
                 <ul class="list-disc list-inside text-gray-600 mt-1 space-y-1">
                     @foreach ($skills as $skill)
-                        <li>{{ $skill }}</li>
+                        <li>{{ $skill->name }}</li>
                     @endforeach
                 </ul>
             </div>

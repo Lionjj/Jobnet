@@ -89,11 +89,11 @@
 
     {{-- Benefits --}}
     @php
-        $benefits = old('benefits') ?? (
-            is_array($company->benefits) ? $company->benefits : json_decode($company->benefits ?? '[]', true)
-        );
+        // Se è una collezione Eloquent la converti in array
+        $benefits = old('benefits') ?? ($company->benefits->toArray() ?? []);
     @endphp
 
     @livewire('company-benefits-input', ['benefits' => $benefits])
+
 
 </div>

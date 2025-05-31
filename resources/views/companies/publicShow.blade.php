@@ -88,7 +88,7 @@
             </h2>
             <ul class="list-disc list-inside text-gray-600 mt-1 space-y-1">
                 @foreach ($benefits as $benefit)
-                    <li>{{ ucfirst($benefit) }}</li>
+                    <li>{{ is_array($benefit) ? $benefit['name'] : $benefit }}</li>
                 @endforeach
             </ul>
         </div>

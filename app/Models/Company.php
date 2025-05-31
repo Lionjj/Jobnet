@@ -15,13 +15,8 @@ class Company extends Model
         'mission',
         'vision',
         'company_culture',
-        'benefits',
         'website',
         'logo',
-    ];
-
-    protected $casts = [
-        'benefits' => 'array',
     ];
 
     public function user()
@@ -32,5 +27,10 @@ class Company extends Model
     public function jobs()
     {
         return $this->hasMany(JobOffert::class);
+    }
+
+    public function benefits()
+    {
+        return $this->belongsToMany(Benefit::class)->withTimestamps();
     }
 }

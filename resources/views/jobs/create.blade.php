@@ -17,7 +17,12 @@
             @csrf
 
             {{-- Componente del form --}}
-            <x-job-offert.form />
+            <x-job-offert.form 
+                :jobOffert="$job ?? null"
+                :skills="$skills ?? []"
+                :benefits="$benefits ?? []"
+            />
+
 
             {{-- Azioni --}}
             <div class="flex justify-end">

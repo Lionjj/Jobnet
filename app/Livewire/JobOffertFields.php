@@ -9,6 +9,12 @@ class JobOffertFields extends Component
     public array $skills = [];
     public array $benefits = [];
 
+    public function mount(array $skills = [], array $benefits = [])
+    {
+        $this->skills = $skills;
+        $this->benefits = $benefits;
+    }
+
     public function addSkill()
     {
         $this->skills[] = '';
@@ -18,6 +24,7 @@ class JobOffertFields extends Component
     {
         unset($this->skills[$index]);
         $this->skills = array_values($this->skills);
+        
     }
 
     public function addBenefit()
@@ -28,7 +35,8 @@ class JobOffertFields extends Component
     public function removeBenefit($index)
     {
         unset($this->benefits[$index]);
-        $this->benefits = array_values($this->benefits);
+        $this->benefits = array_values($this->benefits);  // riordina indici array
+
     }
 
     public function render()

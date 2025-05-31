@@ -77,26 +77,26 @@
                 <h2 class="text-lg font-semibold text-gray-800 mb-1">🎁 Benefit aziendali</h2>
                 <ul class="list-disc list-inside text-gray-700 space-y-1">
                     @foreach ($benefits as $benefit)
-                        <li>{{ $benefit }}</li>
+                        <li>{{ is_array($benefit) ? $benefit['name'] : $benefit }}</li>
                     @endforeach
                 </ul>
             </div>
         @endif
+        <div class="flex justify-between items-center pt-4">
+            {{-- Link back --}}
+            <a href="{{ route('companies.edit', $company) }}"
+            class="text-blue-600 hover:underline mt-6 inline-block">
+                ✏️ Modifica azienda
+            </a>
 
-        {{-- Link back --}}
-        <a href="{{ route('companies.edit', $company) }}"
-        class="text-blue-600 hover:underline mt-6 inline-block">
-            ✏️ Modifica azienda
-        </a>
-
-        <form action="{{ route('companies.destroy', $company) }}" method="POST"
-              onsubmit="return confirm('Vuoi davvero eliminare questa azienda?')">
-            @csrf
-            @method('DELETE')
-            <button class="text-red-600 hover:underline font-medium" type="submit">
-                Elimina
-            </button>
-        </form>
-
+            <form action="{{ route('companies.destroy', $company) }}" method="POST"
+                onsubmit="return confirm('Vuoi davvero eliminare questa azienda?')">
+                @csrf
+                @method('DELETE')
+                <button class="text-red-600 hover:underline font-medium" type="submit">
+                    Elimina
+                </button>
+            </form>
+        </div>
     </div>
 </x-app-layout>

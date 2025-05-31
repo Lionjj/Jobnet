@@ -14,12 +14,12 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // 🔹 Recruiter
-        User::factory(5)->create()->each(function ($user) {
+        User::factory(10)->create()->each(function ($user) {
             $user->assignRole('recruiter');
         });
 
         // 🔹 Candidati
-        User::factory(5)->create()->each(function ($user) {
+        User::factory(100)->create()->each(function ($user) {
             $user->assignRole('candidate');
         });
     }

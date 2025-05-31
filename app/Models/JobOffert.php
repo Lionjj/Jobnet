@@ -15,14 +15,10 @@ class JobOffert extends Model
         'contract_type',      // ex: tempo indeterminato, stage, ecc.
         'experience_level',   // ex: Junior, Middle, Senior
         'ral',                // retribuzione annua lorda
-        'skills_required',    // JSON con elenco competenze
-        'benefits',           // JSON con benefit aziendali
         'is_active',          // per attivare/disattivare l’annuncio
     ];
 
     protected $casts = [
-        'skills_required' => 'array',
-        'benefits' => 'array',
         'ral' => 'decimal:2',
         'is_active' => 'boolean',
     ];
@@ -35,6 +31,17 @@ class JobOffert extends Model
     public function savedByUsers()
     {
         return $this->belongsToMany(User::class, 'saved_jobs')->withTimestamps();
+    }
+
+    public function benefits()
+    {
+        return $this->belongsToMany(Benefit::class, 'job_offert_benefit')->withTimestamps();
+    }
+
+
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'job_offert_skill')->withTimestamps();
     }
 
 }

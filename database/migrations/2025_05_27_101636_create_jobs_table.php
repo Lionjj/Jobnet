@@ -21,8 +21,6 @@ return new class extends Migration
             $table->string('contract_type'); // tempo ind., determinato, stage, ecc.
             $table->string('experience_level'); // Junior, Middle, Senior
             $table->decimal('ral', 10, 2)->nullable(); // retribuzione annua lorda
-            $table->json('skills_required')->nullable(); // oppure text
-            $table->json('benefits')->nullable(); // opzionale
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

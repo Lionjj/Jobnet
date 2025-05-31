@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobOffert;
+use App\Models\Skill;
+use App\Models\Benefit;
 use Illuminate\Http\Request;
 
 class JobOffertController extends Controller
@@ -11,7 +13,7 @@ class JobOffertController extends Controller
     {
         $jobs = JobOffert::whereHas('company', function ($query) {
             $query->where('user_id', auth()->id());
-        })->get();
+        })->paginate(5);
 
         return view('jobs.index', compact('jobs'));
     }
@@ -38,11 +40,10 @@ class JobOffertController extends Controller
             'experience_level' => 'required|string',
             'ral' => 'nullable|numeric',
             'skills_required' => 'nullable|array',
+            'skills_required.*' => 'string|max:255',
             'benefits' => 'nullable|array',
+            'benefits.*' => 'string|max:255',
         ]);
-
-        $validated['skills_required'] = array_map('strtolower', $validated['skills_required'] ?? []);
-        $validated['benefits'] = array_map('strtolower', $validated['benefits'] ?? []);
 
         $company = auth()->user()->company;
 
@@ -52,7 +53,18 @@ class JobOffertController extends Controller
 
         $validated['company_id'] = $company->id;
 
+        $skillsLowercase = array_map('strtolower', $validated['skills_required'] ?? []);
+        $benefitsLowercase = array_map('strtolower', $validated['benefits'] ?? []);
+
+        $benefitIds = $this->findOrCreateBenefits($benefitsLowercase);
+        $skillIds = $this->findOrCreateSkills($skillsLowercase);
+
+        unset($validated['skills_required'], $validated['benefits']);
+
         $job = $company->jobs()->create($validated);
+
+        $job->benefits()->sync($benefitIds);
+        $job->skills()->sync($skillIds);
 
         return redirect()->route('jobs.show', $job)->with('success', 'Offerta pubblicata con successo.');
     }
@@ -74,8 +86,13 @@ class JobOffertController extends Controller
 
         $company = auth()->user()->company;
 
-        return view('jobs.edit', compact('job', 'company'));
+        // Estrarre array di stringhe con i nomi
+        $skills = $job->skills()->pluck('name')->toArray();
+        $benefits = $job->benefits()->pluck('name')->toArray();
+
+        return view('jobs.edit', compact('job', 'company', 'skills', 'benefits'));
     }
+
 
     public function update(Request $request, $id)
     {
@@ -92,17 +109,23 @@ class JobOffertController extends Controller
             'experience_level' => 'required|string',
             'ral' => 'nullable|numeric',
             'skills_required' => 'nullable|array',
+            'skills_required.*' => 'string|max:255',
             'benefits' => 'nullable|array',
+            'benefits.*' => 'string|max:255',
         ]);
         
-        $validated['skills_required'] = array_map('strtolower', $validated['skills_required'] ?? []);
-        $validated['benefits'] = array_map('strtolower', $validated['benefits'] ?? []);
+        $skillsLowercase = array_map('strtolower', $validated['skills_required'] ?? []);
+        $benefitsLowercase = array_map('strtolower', $validated['benefits'] ?? []);
 
-        $job->update([
-            ...$validated,
-            'skills_required' => json_encode($validated['skills_required'] ?? []),
-            'benefits' => json_encode($validated['benefits'] ?? []),
-        ]);
+        $benefitIds = $this->findOrCreateBenefits($benefitsLowercase);
+        $skillIds = $this->findOrCreateSkills($skillsLowercase);
+
+        unset($validated['skills_required'], $validated['benefits']);
+
+        $job->update($validated);
+
+        $job->benefits()->sync($benefitIds);
+        $job->skills()->sync($skillIds);
 
         return redirect()->route('jobs.show', $job)->with('success', 'Offerta aggiornata con successo.');
     }
@@ -146,53 +169,32 @@ class JobOffertController extends Controller
                 ->orWhere('description', 'like', "%{$keyword}%");
             });
         }
-        
+
         if ($request->filled('skill')) {
-            $skill = $request->skill; 
-            $query->whereJsonContains('skills_required', $skill);
-            
+            $skill = $request->skill;
+            $query->whereHas('skills', function ($q) use ($skill) {
+                $q->where('name', $skill);
+            });
         }
         
         if ($request->filled('benefit')) {
             $benefit = $request->benefit;
-            $query->whereJsonContains('benefits', $benefit);
+            $query->whereHas('benefits', function ($q) use ($benefit) {
+                $q->where('name', $benefit);
+            });
         }
 
-        $allSkills = JobOffert::where('is_active', true)
-            ->pluck('skills_required')
-            ->map(function ($skills) {
-                if (is_array($skills)) {
-                    return array_map('strtolower', $skills);
-                }
-                if (is_string($skills)) {
-                    return array_map('strtolower', json_decode($skills, true) ?: []);
-                }
-                return [];
-            })
-            ->flatten()
-            ->unique()
-            ->sort()
-            ->values();
+        $allSkills = Skill::whereHas('jobOfferts', function ($query) {
+            $query->where('is_active', true);
+        })->orderBy('name')->get()->pluck('name');
 
-        $allBenefits = JobOffert::where('is_active', true)
-            ->pluck('benefits')
-            ->map(function ($benefits) {
-                if (is_array($benefits)) {
-                    return array_map('strtolower', $benefits);
-                }
-                if (is_string($benefits)) {
-                    return array_map('strtolower', json_decode($benefits, true) ?: []);
-                }
-                return [];
-            })
-            ->flatten()
-            ->unique()
-            ->sort()
-            ->values();
+        $allBenefits = Benefit::whereHas('jobOfferts', function ($query) {
+            $query->where('is_active', true);
+        })->orderBy('name')->get()->pluck('name');
 
-        $savedJobs = auth()->user()->savedJobs()->paginate(10);
-        // Ottieni i job filtrati con paginazione
-        $jobs = $query->latest()->paginate(10)->withQueryString();
+        $savedJobs = auth()->user()->savedJobs()->with('company')->paginate(5);
+
+        $jobs = $query->with(['company', 'skills', 'benefits'])->latest()->paginate(5)->withQueryString();
 
         // Passa tutto alla view
         return view('jobs.publicIndex', compact('jobs', 'allSkills', 'allBenefits', 'savedJobs'));
@@ -203,4 +205,39 @@ class JobOffertController extends Controller
         $job = JobOffert::where('is_active', true)->findOrFail($id);
         return view('jobs.publicShow', compact('job'));
     }
+
+    private function findOrCreateBenefits(array $names): array
+    {
+        $ids = [];
+
+        foreach ($names as $name) {
+            $benefit = Benefit::whereRaw('LOWER(name) = ?', [strtolower($name)])->first();
+
+            if (!$benefit) {
+                $benefit = Benefit::create(['name' => $name]);
+            }
+
+            $ids[] = $benefit->id;
+        }
+
+        return $ids;
+    }
+
+    private function findOrCreateSkills(array $names): array
+    {
+        $ids = [];
+
+        foreach ($names as $name) {
+            $skill = Skill::whereRaw('LOWER(name) = ?', [strtolower($name)])->first();
+
+            if (!$skill) {
+                $skill = Skill::create(['name' => $name]);
+            }
+
+            $ids[] = $skill->id;
+        }
+
+        return $ids;
+    }
+
 }

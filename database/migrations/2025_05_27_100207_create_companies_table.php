@@ -20,7 +20,6 @@ return new class extends Migration
             $table->text('mission')->nullable();
             $table->text('vision')->nullable();
             $table->text('company_culture')->nullable();
-            $table->json('benefits')->nullable(); // oppure text se non vuoi gestire JSON
             $table->string('location')->nullable();
             $table->string('website')->nullable();
             $table->string('logo')->nullable();

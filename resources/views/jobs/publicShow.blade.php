@@ -32,7 +32,7 @@
         </div>
 
         @php
-            $skills = is_array($job->skills_required) ? $job->skills_required : json_decode($job->skills_required, true) ?? [];
+            $skills = is_array($job->skills) ? $job->skills : json_decode($job->skills, true) ?? [];
             $benefits = is_array($job->benefits) ? $job->benefits : json_decode($job->benefits, true) ?? [];
         @endphp
 
@@ -43,7 +43,7 @@
                 </h2>
                 <ul class="list-disc list-inside text-gray-600 mt-1 space-y-1">
                     @foreach ($benefits as $benefit)
-                        <li>{{ ucfirst($benefit) }}</li>
+                        <li>{{ is_array($benefit) ? $benefit['name'] : $benefit }}</li>
                     @endforeach
                 </ul>
             </div>
@@ -56,7 +56,7 @@
                 </h2>
                 <ul class="list-disc list-inside text-gray-600 mt-1 space-y-1">
                     @foreach ($skills as $skill)
-                        <li>{{ ucfirst($skill) }}</li>
+                        <li>{{ is_array($skill) ? $skill['name'] : $skill }}</li>
                     @endforeach
                 </ul>
             </div>

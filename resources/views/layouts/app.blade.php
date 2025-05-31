@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     @include('layouts.head')
-    @livewireStyles
-    @livewireScripts
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
@@ -28,7 +26,7 @@
                     x-show="show"
                     x-init="setTimeout(() => show = false, 3000)"  {{-- dopo 4 secondi scompare --}}
                     x-transition
-                    class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md"
+                    class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md mt-14"
                 >
                     <div
                         class="flex items-start px-4 py-3 rounded-lg shadow-lg

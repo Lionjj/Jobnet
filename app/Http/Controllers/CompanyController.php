@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Models\Benefit;
 use Illuminate\Http\Request;
 
 class CompanyController extends Controller
@@ -35,18 +36,33 @@ class CompanyController extends Controller
             'vision' => 'nullable|string',
             'company_culture' => 'nullable|string',
             'benefits' => 'nullable|array',
+            'benefits.*' => 'string|max:255',
             'website' => 'nullable|url',
             'logo' => 'nullable|image|max:2048', // max 2MB
         ]);
 
+        $benefitNames = $validated['benefits'] ?? [];
+
+        $benefitIds = [];
+
+        foreach ($benefitNames as $name) {
+            $name = trim(strtolower($name));
+            if ($name === '') continue;
+
+            $benefit = Benefit::firstOrCreate(['name' => $name]);
+            $benefitIds[] = $benefit->id;
+        }
+
         $validated['user_id'] = auth()->id();
-        $validated['benefits'] = array_map('strtolower', $validated['benefits'] ?? []);
+
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('logos', 'public');
             $validated['logo'] = $path;
         }
 
         $company = Company::create($validated);
+
+        $company->benefits()->sync($benefitIds);
 
         return redirect()->route('companies.show', $company)->with('success', 'Azienda creata con successo.');
     }
@@ -59,7 +75,7 @@ class CompanyController extends Controller
 
     public function edit($id)
     {
-        $company = auth()->user()->company()->findOrFail($id);
+        $company = Company::with('benefits')->findOrFail($id);
         return view('companies.edit', compact('company'));
     }
 
@@ -76,16 +92,34 @@ class CompanyController extends Controller
             'vision' => 'nullable|string',
             'company_culture' => 'nullable|string',
             'benefits' => 'nullable|array',
+            'benefits.*' => 'string|max:255',
             'website' => 'nullable|url',
             'logo' => 'nullable|image|max:2048', // max 2MB
         ]);
+
+        $benefitNames = $validated['benefits'] ?? [];
+
+        $benefitIds = [];
+
+        foreach ($benefitNames as $name) {
+            $name = trim(strtolower($name));  // puoi fare normalizzazione
+
+            if ($name === '') continue;
+
+            // cerca il benefit o crealo
+            $benefit = Benefit::firstOrCreate(['name' => $name]);
+
+            $benefitIds[] = $benefit->id;
+        }
+
+        // Ora sincronizzi i benefit associati alla company
+        $company->benefits()->sync($benefitIds);
 
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('logos', 'public');
             $validated['logo'] = $path;
         }
 
-        $validated['benefits'] = array_map('strtolower', $validated['benefits'] ?? []);
         $company->update($validated);
 
         return redirect()->route('companies.show', $company)->with('success', 'Azienda aggiornata con successo.');

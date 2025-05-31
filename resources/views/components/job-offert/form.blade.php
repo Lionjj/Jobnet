@@ -80,13 +80,15 @@
                placeholder="Es. 32000">
     </div>
 
-    {{-- Skills e Benefit --}}
-    <div>
-        @livewire('job-offert-fields', [
-            'skills' => old('skills_required', $jobOffert->skills_required ?? []),
-            'benefits' => old('benefits', $jobOffert->benefits ?? []),
-        ])
-    </div>
+    {{-- Benefits --}}
+    @php
+        // Se è una collezione Eloquent la converti in array
+        $benefits = old('benefits') ?? ($jobOffert->benefits->toArray() ?? []);
+        $skills = old('skills') ?? ($jobOffert->skills->toArray() ?? []);
+    @endphp
+
+    @livewire('job-offert-fields', ['benefits' => $benefits, 'skills' => $skills,])
+
 
     {{-- Stato attivo (solo in edit) --}}
     @if ($jobOffert->exists)
