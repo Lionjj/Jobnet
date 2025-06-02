@@ -45,7 +45,6 @@ Route::middleware(['auth', 'role:candidate'])->group(function () {
     Route::post('/saved-jobs/{jobId}', [SavedJobController::class, 'store'])->name('saved-jobs.store');
     Route::delete('/saved-jobs/{jobId}', [SavedJobController::class, 'destroy'])->name('saved-jobs.destroy');
     Route::get('/saved-jobs', [SavedJobController::class, 'savedJobs'])->name('saved-jobs.index');
-
 });
 
 require __DIR__.'/auth.php';
