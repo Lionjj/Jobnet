@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Cmgmyr\Messenger\Models\Thread;
 use Cmgmyr\Messenger\Models\Message;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\NewMessageReceived;
 
 class MessageController extends Controller
 {
@@ -29,6 +30,18 @@ class MessageController extends Controller
         ]);
 
         $thread->activateAllParticipants();
+
+        // Trova l’unico destinatario (cioè l’altro partecipante diverso dal mittente)
+        $recipient = $thread->participants()
+            ->where('user_id', '!=', Auth::id())
+            ->with('user')
+            ->first();
+
+        // Notifica solo se esiste un destinatario
+        if ($recipient && $recipient->user) {
+            $recipient->user->notify(new NewMessageReceived($message));
+        }
+
 
         return redirect()->route('messages.show', $thread->id);
     }

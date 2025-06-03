@@ -135,8 +135,7 @@
                 @empty
                     <p>Nessuna offerta disponibile al momento.</p>
                 @endforelse
-
-                {{ $jobs->withQueryString()->links() }}
+                {{ $jobs->appends(['tab' => 'jobs'])->links() }}
             </div>
         </div>
         {{-- Tab offerte salvate --}}
@@ -156,7 +155,7 @@
                 @endforeach
 
                 {{-- Se hai la paginazione per le offerte salvate --}}
-                {{ $savedJobs->links() }}
+                {{ $savedJobs->appends(['tab' => 'saved'])->links() }}
             @endif
         </div>
 

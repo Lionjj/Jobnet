@@ -70,7 +70,6 @@ class User extends Authenticatable implements MustVerifyEmail
                     ->withTimestamps();
     }
 
-
     public function experiences()
     {
         return $this->hasMany(Experience::class);
@@ -81,5 +80,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Profile::class);
     }
 
+    public function applications()
+    {
+        return $this->hasMany(JobApplication::class);
+    }
 
 }

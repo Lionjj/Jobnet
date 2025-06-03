@@ -44,4 +44,9 @@ class JobOffert extends Model
         return $this->belongsToMany(Skill::class, 'job_offert_skill')->withTimestamps();
     }
 
+    public function applications()
+    {
+        return $this->hasMany(JobApplication::class);
+    }
+
 }

@@ -8,6 +8,7 @@ use Cmgmyr\Messenger\Models\Thread;
 use Cmgmyr\Messenger\Models\Message;
 use Cmgmyr\Messenger\Models\Participant;
 use Illuminate\Http\Request;
+use App\Notifications\ConversationStarted;
 
 class ChatController extends Controller
 {
@@ -41,6 +42,8 @@ public function startChat(User $user)
 
         Participant::create(['thread_id' => $thread->id, 'user_id' => $me->id]);
         Participant::create(['thread_id' => $thread->id, 'user_id' => $user->id]);
+        
+        $user->notify(new ConversationStarted($me->name));
     }
 
     return redirect()->route('messages.show', $thread->id);

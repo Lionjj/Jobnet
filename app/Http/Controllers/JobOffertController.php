@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\JobOffert;
 use App\Models\Skill;
 use App\Models\Benefit;
+use App\Models\User;
+use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Notifications\JobMatchedNotification;
 
 class JobOffertController extends Controller
 {
@@ -66,17 +69,54 @@ class JobOffertController extends Controller
         $job->benefits()->sync($benefitIds);
         $job->skills()->sync($skillIds);
 
+        // Notifical'offerta di lavoro agli utenti candidati che hanno le competenze teconche richieste
+        $skillNames = Skill::whereIn('id', $skillIds)->pluck('name')->map(fn($name) => strtolower($name))->toArray();
+
+        User::whereHas('skills', function ($query) use ($skillNames) {
+            $query->whereIn(\DB::raw('LOWER(name)'), $skillNames);
+        })->chunk(100, function ($users) use ($job) {
+            foreach ($users as $user) {
+                $user->notify(new JobMatchedNotification($job));
+            }
+        });
+
         return redirect()->route('jobs.show', $job)->with('success', 'Offerta pubblicata con successo.');
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $job = JobOffert::whereHas('company', function ($query) {
             $query->where('user_id', auth()->id());
         })->findOrFail($id);
 
-        return view('jobs.show', compact('job'));
+        // Carica tutti i filtri disponibili
+        $allLanguages = Language::all();
+        $allSkills = Skill::all();
+
+        // Applica filtri alle candidature
+        $applications = $job->applications()
+            ->with('user.languages', 'user.skills', 'user.experiences', 'user.profiles')
+            ->when($request->name, fn($q) => $q->whereHas('user', fn($q2) =>
+                $q2->where('name', 'like', "%{$request->name}%")))
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when($request->language, fn($q) => $q->whereHas('user.languages', fn($q2) =>
+                $q2->where('languages.id', $request->language)))
+            ->when($request->skill, fn($q) => $q->whereHas('user.skills', fn($q2) =>
+                $q2->where('skills.id', $request->skill)))
+            ->when($request->has_experience !== null, function ($q) use ($request) {
+                if ($request->has_experience == '1') {
+                    return $q->whereHas('user.experiences');
+                } elseif ($request->has_experience == '0') {
+                    return $q->whereDoesntHave('user.experiences');
+                }
+            })
+            ->paginate(5)
+            ->appends($request->all());
+
+        return view('jobs.show', compact('job', 'applications', 'allLanguages', 'allSkills'));
     }
+
+
 
     public function edit($id)
     {
