@@ -19,7 +19,7 @@
     </form>
 
         {{-- Form proposta colloquio --}}
-        @if(Auth::user()->hasRole('recruiter'))
+        @if(Auth::user()->hasRole('recruiter') && empty(Auth::user()->company()) && empty(Auth::user()->company()->jobs))
             <hr class="border-gray-200">
             <div x-data="{ open: false }">
                 <button @click="open = !open"
