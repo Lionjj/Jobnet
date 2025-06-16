@@ -78,7 +78,7 @@ services:
         working_dir: /app
         volumes:
             - ./:/app
-        command: sh -c "npm install && npm run dev"
+        command: sh -c "rm -rf node_modules package-lock.json && npm install && npm install vite laravel-vite-plugin --save-dev && npx vite"
         ports:
             - "5173:5173"
 
